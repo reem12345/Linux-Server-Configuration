@@ -91,10 +91,23 @@ CUSTOM , UDP , 123
 $ sudo chmod 700 /home/grader/.ssh
 $ sudo chmod 644 /home/grader/.ssh/authorized_keys 
 
+- set /etc/ssh/sshd_config file for PasswordAuthentication and set it to no and change PermitRootLogin to no.
 
+- Restart SSH: sudo service ssh restart
 
-
+- close the connection and coonect to the server again using: ssh -i ~/.ssh/reem.rsa -p 2200 grader@18.197.52.126
 
 # Prepare to deploy your project
+
+1.Configure the local timezone to UTC.
+
+2. Install and configure Apache to serve a Python mod_wsgi application.
+install Apache: $ sudo apt-get install apache2.
+install python3: $ sudo apt-get install libapache2-mod-wsgi-py3.
+install Enable mod_wsgi $ sudo a2enmod wsgi
+3.Install and configure PostgreSQL:
+
+4. Create a new database user named catalog that has limited permissions to your catalog application database.
+
 # Deploy the Item Catalog project
 
