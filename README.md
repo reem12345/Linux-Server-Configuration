@@ -106,8 +106,164 @@ install Apache: $ sudo apt-get install apache2.
 install python3: $ sudo apt-get install libapache2-mod-wsgi-py3.
 install Enable mod_wsgi $ sudo a2enmod wsgi
 3.Install and configure PostgreSQL:
+$ sudo apt-get install postgresql, while logged in as grader.
 
-4. Create a new database user named catalog that has limited permissions to your catalog application database.
+Switch to the postgres user: sudo su - postgres.
+
+Open PostgreSQL interactive terminal with psql.
+
+Create the catalog user with a password and give them the ability to create databases:
+
+postgres=# CREATE ROLE catalog WITH LOGIN PASSWORD 'catalog';
+postgres=# ALTER ROLE catalog CREATEDB;
+
+Exit psql: \q, then get back to grader user via exit.
+
+Create a new Linux user called catalog: sudo adduser catalog. Enter password and fill out information.
+Give to catalog user the permission to sudo. Run: sudo visudo.
+
+look for the line that have
+
+root    ALL=(ALL:ALL) ALL
+grader  ALL=(ALL:ALL) ALL
+
+Below this line, add a new line to give sudo permissions to catalog user. the file should look like this:
+
+root    ALL=(ALL:ALL) ALL
+grader  ALL=(ALL:ALL) ALL
+catalog  ALL=(ALL:ALL) ALL
+save the file using ctrl x then click y.
+to verify catalog sudo permissions. login as grader: su - catalog , type password, then type sudo -l, type password again the output should be like this.
+Matching Defaults entries for catalog on
+    ip-172-26-7-180.eu-central-1.compute.internal:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User catalog may run the following commands on
+        ip-172-26-7-180.eu-central-1.compute.internal:
+    (ALL : ALL) ALL
+
+while logged in as catalog.
+create database via : createdb catalog.
+Run psql then \l to check that the new database has been created successfully.
+
+Exit psql: \q, then get back to grader user via exit.
+4. Install git.
+While logged in as grader.
+install git via : sudo apt-get install git.
 
 # Deploy the Item Catalog project
+Clone and setup Item Catalog project from Github repository created earlier in the Nanodegree program.
+While logged in as grader.
 
+create /var/www/catalog/ directory.
+
+cd to that directory and clone item catalog repository.
+
+sudo git clone https://github.com/HatoonMo/ItemCatalogProject.git
+
+From the /var/www directory, change the ownership of the catalog directory to grader via: sudo chown -R grader:grader catalog/
+
+Cd to the /var/www/catalog/catalog directory.
+
+Rename the application.py file to __init__.py using: mv application.py __init__.py.
+In __init__.py, replace line 233:
+
+# app.run(host='0.0.0.0', port=5000)
+app.run()
+
+In database_setup.py, replace line 58:
+
+# engine = create_engine('sqlite:///catalogDB.db')
+engine = create_engine('postgresql://catalog:password@localhost/catalog')
+authenticating login through google
+From Google Cloud Plateform.
+Click APIs & services on left menu then Credentials.
+Create an OAuth Client ID, add and add http://35.159.41.242.xip.io as authorized JavaScript origins.
+Add http://35.159.41.242.xip.io/oauth2callback
+http://35.159.41.242.xip.io/login
+http://35.159.41.242.xip.io/gconnect as authorized redirect URI.
+Download the corresponding JSON file, open it then copy the contents and paste them into /var/www/catalog/catalog/c.json.
+Replace the client ID to line 12 of templates/login.html file in the project directory.
+Add the path of c.json to line 18 and 67 of __init__.py
+14 - Install virtual environment and all the project dependencies
+While logged in as grader.
+
+install pip: sudo apt-get install python3-pip.
+
+Install the virtual environment: sudo apt-get install python-virtualenv
+
+Change to the /var/www/catalog/catalog/ directory.
+
+Create the virtual environment: sudo virtualenv -p python3 venv3.
+
+Change the ownership to grader with: sudo chown -R grader:grader venv3/.
+
+Activate the new environment: . venv3/bin/activate.
+
+Install the following dependencies:
+
+
+pip install flask
+pip install sqlalchemy
+pip install requests
+pip install psycopg2
+pip install --upgrade oauth2client
+Run python3 __init__.py to check everything is okay:
+
+* Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+
+Deactivate the virtual environment: deactivate.
+
+15- set up virtual host
+Create /etc/apache2/sites-available/catalog.conf and add the following lines to configure the virtual host:
+<VirtualHost *:80>
+   ServerName 35.159.41.242
+   ServerAlias 35.159.41.242.xip.io
+   WSGIScriptAlias / /var/www/catalog/catalog.wsgi
+   <Directory /var/www/catalog/catalog/>
+       Order allow,deny
+         Allow from all
+   </Directory>
+   Alias /static /var/www/catalog/catalog/static
+   <Directory /var/www/catalog/catalog/static/>
+         Order allow,deny
+         Allow from all
+   </Directory>
+   ErrorLog ${APACHE_LOG_DIR}/error.log
+   LogLevel warn
+   CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+Add the following line in /etc/apache2/mods-enabled/wsgi.conf file to use Python 3.
+       WSGIPythonPath /var/www/catalog/catalog/venv3/lib/python3.5/site-packages
+sudo a2ensite catalog to enable virtual host.
+sudo service apache2 reload to reload Apache server.
+16- Setting up flask application
+Create /var/www/catalog/catalog.wsgifile then add these lines
+activate_this = '/var/www/catalog/catalog/venv3/bin/activate_this.py'
+with open(activate_this) as file_:
+   exec(file_.read(), dict(__file__=activate_this))
+
+#!/usr/bin/python3
+import sys
+import logging
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0, "/var/www/catalog/catalog/")
+sys.path.insert(1, "/var/www/catalog/")
+
+from catalog import app as application
+application.secret_key = "---"
+
+sudo service apache2 restart to restart the Apache server.
+
+17- set up the database and fill it with data
+cd to /var/www/catalog/catalog/ directory.
+activate the virtual environment via :. venv3/bin/activate.
+Run database_setup.py first
+Run seeder.py second
+deactivate virtual environment.
+18- start the web application
+sudo a2dissite 000-default.conf to disable the default Apache site.
+sudo service apache2 reload
+sudo service apache2 restart.
+open in browser http://35.159.41.242.xip.io.
