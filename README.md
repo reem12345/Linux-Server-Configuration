@@ -36,7 +36,65 @@ $ sudo apt-get upgrade
 
 $ sudo apt-get dist-upgrade
 
+2. Change the SSH port from 22 to 2200. Make sure to configure the Lightsail firewall to allow it.
+
+- edit sudo nano /etc/ssh/sshd_config file by change the port number from 22 to 2200
+
+3. Configure the Uncomplicated Firewall (UFW) to only allow incoming connections for SSH (port 2200), HTTP (port 80), and NTP (port 123).
+
+$ sudo ufw status it should be inactive.
+
+$ sudo ufw default deny incoming
+
+$ sudo ufw default allow outgoing
+
+Allow incoming tcp packets on port 2200 $ sudo ufw allow 2200/tcp
+
+Allow incoming udp packets on port 123 $ sudo ufw allow 123/udp
+
+Allow HTTP traffic in : $ sudo ufw allow www
+
+Deny tcp and udp packets on port 22 $ sudo ufw deny 22
+
+unable the firewell: $ sudo ufw enable
+
+close the connection using : ctrl + D
+
+go to your instance choices in Amazon Lightsail and select manage and add:
+
+HTTP , TCP , 80
+
+CUSTOM , TCP, 2200
+
+CUSTOM , UDP , 123
+
 # Give grader access
+
+1. create new user using this command: $ sudo adduser grader
+
+2. Give grader the permission to sudo:
+
+- in your terminal:  type $ sudo visudo
+
+- add this line (grader  ALL=(ALL:ALL) ALL) after (root    ALL=(ALL:ALL) ALL) in the opend file.
+
+3.Create an SSH key pair for grader using the ssh-keygen tool:
+
+- From a new terminal run the command: $ ssh-keygen -f ~/.ssh/reem.rsa
+
+- $ cat ~/.ssh/reem.rsa.pub (copy it's content)
+
+- login as grader user and $ cd /home/grader then type this commands $ mkdir .ssh ,$ touch .ssh/authorized_keys and edit the authorized_keys file by paste the content of reem.rsa.pub using $ nano .ssh/authorized_keys command.
+
+- change the authorized_keys permission:
+
+$ sudo chmod 700 /home/grader/.ssh
+$ sudo chmod 644 /home/grader/.ssh/authorized_keys 
+
+
+
+
+
 # Prepare to deploy your project
 # Deploy the Item Catalog project
 
