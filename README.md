@@ -328,3 +328,7 @@ $ sudo apt-get update
 $ sudo apt-get upgrade
 
 $ sudo apt-get dist-upgrade
+
+Refrences:
+https://github.com/mulligan121/Udacity-Linux-Configuration/blob/master/README.md
+https://github.com/HatoonMo/Linux-Server-Configuration-Project
