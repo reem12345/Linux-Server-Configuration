@@ -19,6 +19,9 @@ private key:
 
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDL7/tlwKn8wtw81KUCgZVAnjdKH7qQsrpVNQb0MfgDc/bDnt7pj8bPwpgx8KmS9dI+QdYEbr0oc8QK5NfjD6ZONfX25D+kIGsnpSD12byW5sBc5zpqDVfbpU5V3jVB20bPUWZHudmk48zOu06StcWtRTTLnhOfeM9Hqy5r0rHIl1fGE2HM1mVlZFQALxpDYgHL5lWw3ngYQn7H4KGwaDhDdzlXXIJqYQTM5xbDQQ/n9a4iecqF5JTNvi8kw5MpBlFxfgxlxSzBwcj5c3jVxrtvEfsywJlhuGK/QHb7jHWlmeeHC7nzn2Klk7jYT5aOWzB/Lnf/KQ8cg3KoRtQSwikn reem3@LAPTOP-GTJMHB4M
 
+grader password: 1234
+passphrase password: 12345
+
 
 # Project Steps:
 # Get your server
